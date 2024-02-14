@@ -28,7 +28,7 @@
     }
     function onAccelerometerChanged(event) {
         const characteristic = event.target;
-        console.log('Accelerometer data changed', characteristic.value)
+        //console.log('Accelerometer data changed', characteristic.value)
         var a1 = characteristic.value.getUint8(0);
         var a2 = characteristic.value.getUint8(1);
         var a3 = characteristic.value.getUint8(2);
