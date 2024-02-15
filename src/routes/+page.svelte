@@ -1,7 +1,13 @@
 <script >
     //variable Init
+    import Chart from 'chart.js/auto';
+    import { Line } from 'svelte-chartjs';
+
     import {onMount} from "svelte";
-    import Chart from "../components/Chart.svelte";
+    import LineGraph from "../components/LineGraph.svelte";
+    import data2 from "../components/data2.js";
+    // import {data} from "../components/data.js";
+    let chartData;
     var isAvailable = false;
     var deviceServer;
 
@@ -11,8 +17,55 @@
     $: gauseReading = 0.0;
 
     $: dataArray = [];
+    $: TimeArray = [];
+
+    var  chart;
+
     //function to be called on click
     onMount(() => {
+
+        const ctx = document.getElementById('chart');
+
+          chart = new Chart(ctx, {
+            //Type of the chart
+            type: 'line',
+            data: {
+                //labels on x-axis
+                labels: [],
+                datasets: [{
+                    //The label for the dataset which appears in the legend and tooltips.
+                    label: 'Price',
+                    //data for the line
+                    data: [],
+                    //styling of the chart
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                elements: {
+                    point:{
+                        radius: 0
+                    }
+                },
+                animation: {
+                    duration: 0
+                },
+                scales: {
+                    //make sure Y-axis starts at 0
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+            }
+        });
+
+
         enableBluetooth();
     });
     async function enableBluetooth() {
@@ -41,11 +94,14 @@
             view.setUint8(i, b);
         });
         var num = view.getFloat32(0);
-        gauseReading = num.toFixed(1);
+        gauseReading = num.toFixed(5);
         //counter.push(num);
 
-        dataArray.push(num*100);
-
+        dataArray.push(num.toFixed(1));
+        TimeArray.push(new Date().toLocaleTimeString());
+        chart.data.labels = TimeArray;
+        chart.data.datasets[0].data = dataArray;
+        chart.update();
 
     }
     async function subscribeToAccelerometerCharacteristic() {
@@ -77,15 +133,37 @@
             return Promise.reject();
         }
     }
+
+    $: data = {
+        labels: TimeArray,
+        datasets: [
+            {
+                label: 'My First dataset',
+
+
+                data: dataArray,
+            }
+        ],
+    }
+
+
 </script>
+<!--<div>-->
+<!--    <canvas id="chart"></canvas>-->
+<!--</div>-->
+<main>
+    <button on:click={requestBluetoothDevices} disabled={!isAvailable} class="btn btn-primary">
+        Connect Bluetooth Device
+    </button>
+    <h1>{gauseReading}</h1>
+    <div>
+        <canvas id="chart"></canvas>
+    </div>
+</main>
 
-<!--<main>-->
-<!--    <Chart  graphData = {dataArray}/>-->
-<!--</main>-->
-<button on:click={requestBluetoothDevices} disabled={!isAvailable} class="btn btn-primary">
-    Connect Bluetooth Device
-</button>
 
 
-<h1>{gauseReading}</h1>
+
+
+<!--<h1>{gauseReading}</h1>-->
 

@@ -1,6 +1,7 @@
 <script>
     import { Line } from 'svelte-chartjs';
     import { data } from './data.js';
+    export  let graphData ;
     import {
         Chart as ChartJS,
         Title,
@@ -24,5 +25,5 @@
 
 
 </script>
-<!--<h1>{$graphData.length}</h1>-->
+<p>{$graphData.length}</p>
 <Line {data} options={{ responsive: true }} />
